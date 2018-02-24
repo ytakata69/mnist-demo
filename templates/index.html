@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>MNIST demo</title>
+</head>
+<body>
+
+<h1>MNIST demo</h1>
+
+<form action="{{ url_for('send') }}"
+      method="post" enctype="multipart/form-data">
+  <input type="file" id="img_file" name="img_file" />
+  <input type="submit" value="送信" />
+</form>
+
+</body>
+</html>
