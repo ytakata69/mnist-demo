@@ -1,3 +1,4 @@
 chainer==3.2.0
 Flask==0.12.2
+gunicorn==19.7.1
 numpy==1.14.1
