@@ -11,6 +11,8 @@ from flask import Flask, jsonify, redirect, render_template, request, url_for
 from werkzeug import secure_filename
 from PIL import Image
 
+from mnist import inferFromImage
+
 ALLOWED_EXTENSIONS = set(['PNG', 'png', 'JPG', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
@@ -30,11 +32,11 @@ def send():
     if file and allowed_file(file.filename):
       filename = secure_filename(file.filename)
       img = Image.open(file)
+      infer = inferFromImage(img)
       result = {
         "Result": {
           "filename": filename,
-          "bands": img.getbands(),
-          "bbox":  img.getbbox()
+          "infer": infer
         }
       }
       return jsonify(ResultSet=result)

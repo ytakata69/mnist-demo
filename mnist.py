@@ -59,19 +59,22 @@ def infer(x, gpu_id=-1):
 
   return y.argmax(axis=1)[0]
 
-
-if __name__ == '__main__':
+def inferFromImage(img):
   from PIL import Image, ImageOps
   import numpy as np
 
-  # テスト画像の読み込み
-  img = Image.open('data/three.png')
   img = img.convert('L')	# grayscale
   img = img.resize((28, 28), Image.ANTIALIAS)
   img = ImageOps.invert(img)	# negate
-  img.show()
+  #img.show()
 
   # NumPy配列に変換
   arrayImg = np.asarray(img).astype(np.float32) / 255.
 
-  print('予測ラベル:', infer(arrayImg))
+  return int(infer(arrayImg))
+
+if __name__ == '__main__':
+  from PIL import Image
+
+  img = Image.open('data/three.png')
+  print('予測ラベル:', inferFromImage(img))
