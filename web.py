@@ -8,7 +8,6 @@
 
 import os
 from flask import Flask, jsonify, redirect, render_template, request, url_for
-from werkzeug import secure_filename
 from PIL import Image
 
 from mnist import inferFromImage
@@ -30,12 +29,11 @@ def send():
   if request.method == 'POST':
     file = request.files['img_file']
     if file and allowed_file(file.filename):
-      filename = secure_filename(file.filename)
       img = Image.open(file)
       infer = inferFromImage(img)
       result = {
         "Result": {
-          "filename": filename,
+          "filename": file.filename,
           "infer": infer
         }
       }
