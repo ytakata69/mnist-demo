@@ -75,8 +75,21 @@ drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/D
 ### Heroku へのデプロイ
 
 * `Procfile` - プロセス定義ファイル
-* `requirements.txt` - 依存ライブラリのリスト
+  ```
+  web: gunicorn web:app --log-file=-
+  ```
 * `runtime.txt` - 実行環境指定ファイル (Pythonのバージョンを指定)
+  ```
+  python-3.6.4
+  ```
+* `requirements.txt` - 依存ライブラリのリスト
+  ```
+  chainer==3.2.0
+  Flask==0.12.2
+  gunicorn==19.7.1
+  numpy==1.14.1
+  Pillow==5.0.0
+  ```
 
 上記のファイルを置いておけば，Heroku が勝手に必要なライブラリをインストールしてWebサーバ ([Gunicorn](http://gunicorn.org)) を起動してサービスを開始する。
 
