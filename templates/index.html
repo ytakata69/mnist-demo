@@ -3,16 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <title>MNIST demo</title>
+  <link rel="stylesheet" href="/static/drawingboard.min.css" />
+  <style>
+    #my-board {
+      width:  165px;
+      height: 200px;
+    }
+    #inference-result {
+      display: inline-block;
+      width: 200px;
+      border: 1px solid #ccc;
+      padding: 3px 6px;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: #ccc;
+    }
+  </style>
 </head>
 <body>
 
 <h1>MNIST demo</h1>
 
-<form action="{{ url_for('send') }}"
-      method="post" enctype="multipart/form-data">
-  <input type="file" id="img_file" name="img_file" />
-  <input type="submit" value="送信" />
-</form>
+<!-- place holder of the drawingboard canvas -->
+<div class="board" id="my-board"></div>
+<br />
+
+<p id="inference">
+  <button type="button" onclick="doInfer()">送信</button>
+  <span id="inference-result">
+    <span style="color: #ccc">判別結果</span>
+  </span>
+</p>
+
+<!-- jquery is required - zepto might do the trick too -->
+<script src="/static/jquery.min.js"></script>
+<script src="/static/drawingboard.min.js"></script>
+<script>
+  // drawingboardを生成する
+  var myBoard = new DrawingBoard.Board('my-board', {
+      controls: [
+        { Navigation: { back: false, forward: false, reset: true } }
+      ],
+      controlsPosition: 'bottom left',
+      size: 8  // pencil size
+    });
+
+  // 画像を推論サーバに送信する
+  function doInfer() {
+    // drawingboardの画像を取り出す (dataURI形式)
+    var img = myBoard.getImg();
+    if (img == myBoard.blankCanvas) { return; } // 白紙なら無視
+
+    // ファイル送信を模倣
+    var formData = new FormData();
+    formData.append('img_file', dataURItoBlob(img), 'drawing.png');
+    $.ajax({
+      url: '/send',
+      type: 'POST',
+      data: formData,
+      processData: false,  // for sending a file
+      contentType: false,  // for sending a file
+      dataType: 'json',    // 受信データ型
+      success: showResult,
+      error: function () { alert('Error'); }
+    });
+  }
+
+  // 推論結果を表示
+  function showResult(result) {
+    //console.log(result);
+    var digit = result.ResultSet.Result.infer;
+    $('#inference-result').text('これは「' + digit + '」です');
+  }
+
+  // dataURIをBlobに変換
+  // https://stackoverflow.com/questions/4998908
+  function dataURItoBlob(dataURI) {
+    // "data:image/png;base64,iVBORw0KGgoAAAANS..."
+
+    var da = dataURI.split(',');
+    var byteString;
+    if (da[0].indexOf('base64') >= 0) {
+      byteString = atob(da[1]);
+    } else {
+      byteString = unescape(da[1]);
+    }
+    var mimeType = da[0].split(':')[1].split(';')[0];
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ia], { type: mimeType });
+  }
+</script>
+
+<hr />
+<div class="footnote">
+<a href="https://github.com/Leimi/drawingboard.js">drawingboard.js</a> |
+<a href="https://jquery.com">jQuery</a> |
+<a href="http://flask.pocoo.org">Flask</a> |
+<a href="https://chainer.org">Chainer</a>
+</div>
 
 </body>
 </html>
