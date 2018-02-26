@@ -25,6 +25,12 @@
 <body>
 
 <h1>MNIST demo</h1>
+<p>
+手書き数字データ集合 <a href="http://yann.lecun.com/exdb/mnist/"
+>MNIST</a> による機械学習を使ったお遊びデモです。<br />
+下の正方形の枠に 0〜9 のいずれかを書いて，「送信」を押してください。<br />
+「×」を押すと枠内を消去します。
+</p>
 
 <!-- place holder of the drawingboard canvas -->
 <div class="board" id="my-board"></div>
@@ -98,6 +104,11 @@
     return new Blob([ia], { type: mimeType });
   }
 </script>
+
+<p>
+（画像の正規化をしていないので）
+枠の中心から外れた位置に書いたり，小さく書いたりすると，正しく判別されません。
+</p>
 
 <hr />
 <div class="footnote">
