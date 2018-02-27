@@ -39,6 +39,12 @@ class MLP(chainer.Chain):
     return self.l3(h2)
 
 def infer(x, gpu_id=-1):
+  """
+  入力xに対する推論結果を返す
+  :param numpy.ndarray x: 入力
+  :rtype:  (int, [float])
+  :return: (予測ラベル, [各ラベルに対する出力値])
+  """
   from chainer.cuda import to_cpu
   from chainer import serializers
 
@@ -57,24 +63,31 @@ def infer(x, gpu_id=-1):
   y = y.array		# Variable形式で出てくるので中身を取り出す
   y = to_cpu(y)		# 結果をCPUに送る
 
-  return y.argmax(axis=1)[0]
+  return (int(y.argmax(axis=1)[0]), y.tolist()[0])
 
 def inferFromImage(img):
+  """
+  画像imgに対する推論結果を返す
+  :param PIL.Image.Image img: 画像
+  :rtype:  (int, [float], PIL.Image.Image)
+  :return: (予測ラベル, [各ラベルに対する出力値], 正規化画像)
+  """
   from PIL import Image, ImageOps
   import numpy as np
 
   img = img.convert('L')	# grayscale
   img = img.resize((28, 28), Image.ANTIALIAS)
   img = ImageOps.invert(img)	# negate
-  #img.show()
 
   # NumPy配列に変換
   arrayImg = np.asarray(img).astype(np.float32) / 255.
 
-  return int(infer(arrayImg))
+  return infer(arrayImg) + (img,)
 
 if __name__ == '__main__':
   from PIL import Image
 
   img = Image.open('data/three.png')
-  print('予測ラベル:', inferFromImage(img))
+  label, outputs, img = inferFromImage(img)
+  img.show()
+  print('予測ラベル:', label)

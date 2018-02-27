@@ -15,6 +15,16 @@
       border: 1px solid #ccc;
       padding: 3px 6px;
     }
+    #outputs {
+      border: 1px solid #ccc;
+      width:  90%;
+      height: 28px;
+      font-family: monospace;
+    }
+    #outputs img {
+      float: left;
+      margin-right: 10px;
+    }
     hr {
       border: 0;
       height: 1px;
@@ -91,11 +101,22 @@
     //console.log(result);
     var digit = result.ResultSet.Result.infer;
     $('#inference-result').text('これは「' + digit + '」です');
+
+    var image  = result.ResultSet.Result.image;
+    var values = result.ResultSet.Result.values;
+    var str = '';
+    str += '<img src="' + image + '" /> ';
+    for (var i = 0; i < values.length; i++) {
+      if (i > 0) { str += ', '; }
+      str += '' + values[i][1] + ':' + values[i][0].toFixed(1);
+    }
+    $('#outputs').html(str);
   }
 
   // 推論結果を消去
   function resetResult() {
     $('#inference-result').html(initialResult);
+    $('#outputs').text('');
   }
 
   // dataURIをBlobに変換
@@ -123,6 +144,7 @@
 （画像の正規化をしていないので）
 枠の中心から外れた位置に書いたり，小さく書いたりすると，正しく判別されません。
 </p>
+<p id="outputs"></p>
 
 <hr />
 <div class="footnote">
