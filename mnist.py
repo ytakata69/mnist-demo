@@ -38,22 +38,24 @@ class MLP(chainer.Chain):
     h2 = F.relu(self.l2(h1))
     return self.l3(h2)
 
-def infer(x, gpu_id=-1):
+from chainer.cuda import to_cpu
+from chainer import serializers
+
+infer_net = MLP()
+serializers.load_npz('data/mnist.model', infer_net)
+
+gpu_id = -1
+if gpu_id >= 0:	# CPUで計算したい場合は-1
+  infer_net.to_gpu(gpu_id)
+
+
+def infer(x):
   """
   入力xに対する推論結果を返す
   :param numpy.ndarray x: 入力
   :rtype:  (int, [float])
   :return: (予測ラベル, [各ラベルに対する出力値])
   """
-  from chainer.cuda import to_cpu
-  from chainer import serializers
-
-  infer_net = MLP()
-  serializers.load_npz('data/mnist.model', infer_net)
-
-  if gpu_id >= 0:	# CPUで計算したい場合は-1
-    infer_net.to_gpu(gpu_id)
-
   x = x[None, ...]	# ミニバッチの形にする
 
   # ネットワークと同じデバイス上にデータを送る
