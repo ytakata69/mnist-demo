@@ -78,13 +78,61 @@ def inferFromImage(img):
   import numpy as np
 
   img = img.convert('L')	# grayscale
-  img = img.resize((28, 28), Image.ANTIALIAS)
   img = ImageOps.invert(img)	# negate
+
+  # 前処理: 非0領域をアスペクト比を変えずに20x20の矩形に収め，
+  # 重心を中心にして28x28にする
+  # References:
+  #   http://opensourc.es/blog/tensorflow-mnist
+
+  img = img.crop(box=img.getbbox())	# crop
+  wd, ht = img.size
+
+  # アスペクト比を変えずに20x20の矩形に収める
+  if wd < ht:
+    wd = wd * 20 // ht
+    ht = 20
+  else:
+    ht = ht * 20 // wd
+    wd = 20
+  img = img.resize((wd, ht), Image.ANTIALIAS)
+
+  cx, cy = centerOfMass(img)	# 重心
+
+  # 重心を中心にして28x28の矩形の中に配置
+  bgImg = Image.new(img.mode, (28, 28), color=0)
+  ox = -cx + 28 // 2
+  oy = -cy + 28 // 2
+  bgImg.paste(img, (ox, oy))
+  img = bgImg
 
   # NumPy配列に変換
   arrayImg = np.asarray(img).astype(np.float32) / 255.
 
   return infer(arrayImg) + (img,)
+
+def centerOfMass(img):
+  """
+  画像imgの重心位置を返す
+  :param PIL.Image.Image img: グレイスケール画像
+  :rtype:  (int, int)
+  :return: (重心のX座標, 重心のY座標)
+  """
+  import numpy as np
+
+  m = np.asarray(img)	# NumPy配列に変換
+  ht, wd = m.shape
+  sum = np.sum(m)
+
+  # https://stackoverflow.com/questions/37519238
+  dx = np.sum(m, axis=0)	# 各列の合計からなるベクトル
+  dy = np.sum(m, axis=1)	# 各行の合計からなるベクトル
+
+  # np.arange(wd) == [0, 1, 2, ..., wd-1]
+  cx = np.sum(dx * np.arange(wd)) / sum
+  cy = np.sum(dy * np.arange(ht)) / sum
+
+  return (int(np.rint(cx)), int(np.rint(cy)))
 
 if __name__ == '__main__':
   from PIL import Image

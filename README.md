@@ -42,7 +42,12 @@ serializers.save_npz('mnist.model', net)
 MNISTに合わせて，入力画像を 28&times;28 = 784 画素 (0.0〜1.0, 背景が0.0) の配列に変換しなければならない。
 画像の変換に [Pillow](https://pillow.readthedocs.io/en/latest/) を使っている。
 
-（「描画内容が中心に大きく」収録されるよう補正した方が精度が上がるかも知れないが，さぼっている。）
+[MNIST](http://yann.lecun.com/exdb/mnist/) 配布元の説明に従って，以下の前処理を実行している (`mnist.inferFromImage`)。重心の計算はNumPyで行っている。
+
+1. 余白を除く
+2. 20&times;20の矩形にぴったり合うようアスペクト比を変えずに大きさを調節
+3. 28&times;28の矩形の中に重心 (center of mass) を中心にして配置
+
 
 ## Webアプリ化
 
