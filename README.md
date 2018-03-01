@@ -57,8 +57,8 @@ PythonベースWebフレームワーク
 
 `web.py` の機能は以下の2つだけ。数十行でできている。
 
-* URL `/` がアクセスされるとメインページを返す。
-* URL `/send` にてPNGまたはJPEGファイルのアップロードを受け付け，`mnist.py` の `inferFromImage` を呼び出して，実行結果をJSONで返す。
+* `/` がアクセスされるとメインページを返す。
+* `/send` にてPNGまたはJPEGファイルのアップロードを受け付け，`mnist.py` の `inferFromImage` を呼び出して，実行結果をJSONで返す。
 
 ### drawingboard.js による手書きUI
 
@@ -68,9 +68,8 @@ PythonベースWebフレームワーク
 [drawingboard.jsのデモページ](http://leimi.github.io/drawingboard.js/)
 
 drawingboard.js を使うのに [jQuery](https://jquery.com) が必要。
-ついでなので，`web.py` への画像判別リクエストに [jQuery.ajax()](http://api.jquery.com/jquery.ajax/) を使っている。
 
-drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/Data_URI_scheme) 形式で取り出されるが，これをファイルアップロード形式で送信するのがちょっと面倒だった。`web.py` を変更して data URI を受け取るようにする，という選択肢もある。
+drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/Data_URI_scheme) 形式で取り出されるが，これをファイルアップロード形式で送信するのが若干面倒だった ([StackOverflowの記事](https://stackoverflow.com/questions/4998908)を参考にした)。`web.py` を変更して data URI を受け取るようにする，という選択肢もある。
 
 ### Heroku へのデプロイ
 
@@ -93,6 +92,20 @@ drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/D
 
 上記のファイルを置いておけば，Heroku が勝手に必要なライブラリをインストールしてWebサーバ ([Gunicorn](http://gunicorn.org)) を起動してサービスを開始する。
 
+デプロイの前に手元でテスト実行する場合は，下記を実行すればよい。`http://127.0.0.1:5000/` でアクセスできるサーバが起動する。
+
+```bash
+$ pip install -r requirements.txt  # 依存ライブラリをインストール
+$ python3 web.py                   # サーバを起動
+```
+
+## 使用ライブラリ
+
+* [Chainer](https://chainer.org) - ニューラルネットワーク・ライブラリ
+* [Pillow](https://pillow.readthedocs.io/en/latest/) - PIL (Python Imaging Library) 互換ライブラリ
+* [Flask](http://flask.pocoo.org) - Pythonベースの軽量Webフレームワーク
+* [jQuery](https://jquery.com) - JavaScript拡張ライブラリ．drawingboard.jsが依存
+* [drawingboard.js](https://github.com/Leimi/drawingboard.js#drawingboardjs) - HTML5 canvasベースのドローソフト
 
 ## 参考資料
 
