@@ -14,13 +14,19 @@
 
 MNISTを使って訓練したニューラルネットを使って，入力画像から推論結果 (0〜9) を計算する（`mnist.py` を単独で実行すると，`data/three.png` に対する推論結果を出力する）。
 
-ほぼ[チュートリアル](https://qiita.com/mitmul/items/1e35fba085eb07a92560)通りの内容（PNG画像をNumPy配列に変換する部分は後述）。
+ほぼ[チュートリアル](https://qiita.com/mitmul/items/1e35fba085eb07a92560)のプログラム例の通り（PNG画像をNumPy配列に変換する部分は後述）。
 
 ### 学習
 
-学習は，[chainer.git](https://github.com/chainer/chainer.git) の `examples/mnist/train_mnist.py` を実行するだけ（GPUがなくても6〜7分で終わる）。
+学習は，[chainer.git](https://github.com/chainer/chainer.git) の `examples/mnist/train_mnist.py` を，無改造・オプション指定なしで実行しただけ（GPUがなくても6〜7分で終わる）。
 
-`train_mnist.py` による学習結果は `result/snapshot_iter_12000` というファイルに保存される。このファイル (snapshotファイル) はネットワークパラメータ以外の情報も含んでいるので，以下のようなコードを実行してモデルパラメータだけ取り出す（`train_mnist_custom_loop.py` を使った場合はsnapshotファイルではなくmodelファイルが出力される）。
+* 中間層2層, それぞれ1000ノード, 活性化関数はReLU
+* 更新アルゴリズムはAdam
+  （勾配降下法の改良の一つ．
+  [参考記事](https://postd.cc/optimizing-gradient-descent/)）
+* 損失関数はsoftmax cross entropy
+
+`train_mnist.py` による学習結果は `result/snapshot_iter_12000` というファイルに保存される。このファイル (snapshotファイル) はネットワークパラメータ以外の情報も含んでいるので，以下のようなコードを実行してネットワークパラメータだけ取り出す（`train_mnist_custom_loop.py` を使った場合はsnapshotファイルではなくmodelファイルが出力される）。
 
 ```python
 from train_mnist import MLP
@@ -42,7 +48,7 @@ serializers.save_npz('mnist.model', net)
 MNISTに合わせて，入力画像を 28&times;28 = 784 画素 (0.0〜1.0, 背景が0.0) の配列に変換しなければならない。
 画像の変換に [Pillow](https://pillow.readthedocs.io/en/latest/) を使っている。
 
-[MNIST](http://yann.lecun.com/exdb/mnist/) 配布元の説明に従って，以下の前処理を実行している (`mnist.inferFromImage`)。重心の計算はNumPyで行っている。
+[MNIST](http://yann.lecun.com/exdb/mnist/) 配布元の説明に従って，以下の前処理を実行（`mnist.py`の`inferFromImage`を参照）。重心の計算はNumPyで行っている。
 
 1. 余白を除く
 2. 20&times;20の矩形にぴったり合うようアスペクト比を変えずに大きさを調節
@@ -74,7 +80,7 @@ PythonベースWebフレームワーク
 
 drawingboard.js を使うのに [jQuery](https://jquery.com) が必要。
 
-drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/Data_URI_scheme) 形式で取り出されるが，これをファイルアップロード形式で送信するのが若干面倒だった ([StackOverflowの記事](https://stackoverflow.com/questions/4998908)を参考にした)。`web.py` を変更して data URI を受け取るようにする，という選択肢もある。
+drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/Data_URI_scheme) 形式で取り出されるが，これをファイルアップロード形式で送信するのが若干面倒だった（[参考記事](https://stackoverflow.com/questions/4998908)）。`web.py` を変更して data URI を受け取るようにする，という選択肢もある。
 
 ### Heroku へのデプロイ
 
@@ -116,3 +122,4 @@ $ python3 web.py                   # サーバを起動
 
 * [Chainer v3 ビギナー向けチュートリアル](https://qiita.com/mitmul/items/1e35fba085eb07a92560)
 * 実践! GPUサーバでディープラーニング, 長谷川猛, [Software Design 2018年3月号](http://gihyo.jp/magazine/SD/archive/2018/201803)
+* [Tensorflow, MNIST and your own handwritten digits](http://opensourc.es/blog/tensorflow-mnist)
