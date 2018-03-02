@@ -25,6 +25,8 @@ MNISTを使って訓練したニューラルネットを使って，入力画像
   （勾配降下法の改良の一つ．
   [参考記事](https://postd.cc/optimizing-gradient-descent/)）
 * 損失関数はsoftmax cross entropy
+* 20エポック
+* (テストデータの正解率 98.2%)
 
 `train_mnist.py` による学習結果は `result/snapshot_iter_12000` というファイルに保存される。このファイル (snapshotファイル) はネットワークパラメータ以外の情報も含んでいるので，以下のようなコードを実行してネットワークパラメータだけ取り出す（`train_mnist_custom_loop.py` を使った場合はsnapshotファイルではなくmodelファイルが出力される）。
 
