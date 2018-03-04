@@ -25,7 +25,7 @@ MNISTを使って訓練したニューラルネットを使って，入力画像
   （勾配降下法の改良の一つ．
   [参考記事](https://postd.cc/optimizing-gradient-descent/)）
 * 損失関数はsoftmax cross entropy
-* 20エポック
+* エポック数 20, バッチサイズ 100
 * (テストデータの正解率 98.2%)
 
 `train_mnist.py` による学習結果は `result/snapshot_iter_12000` というファイルに保存される。このファイル (snapshotファイル) はネットワークパラメータ以外の情報も含んでいるので，以下のようなコードを実行してネットワークパラメータだけ取り出す（`train_mnist_custom_loop.py` を使った場合はsnapshotファイルではなくmodelファイルが出力される）。
@@ -56,6 +56,8 @@ MNISTに合わせて，入力画像を 28&times;28 = 784 画素 (0.0〜1.0, 背�
 2. 20&times;20の矩形にぴったり合うようアスペクト比を変えずに大きさを調節
 3. 28&times;28の矩形の中に重心 (center of mass) を中心にして配置
 
+`mnist.py` を単独で実行すると，前処理後の画像を [PIL.Image.Image.show()](https://pillow.readthedocs.io/en/3.1.x/reference/Image.html#PIL.Image.Image.show) を使って表示する。
+Webアプリ版では，ページ下部のデバッグ出力欄に，前処理後の画像と，ラベル0〜9に対するニューラルネットの出力値（出力値の降順に整列）を表示する。
 
 ## Webアプリ化
 
@@ -72,6 +74,14 @@ PythonベースWebフレームワーク
 
 * `/` がアクセスされるとメインページを返す。
 * `/send` にてPNGまたはJPEGファイルのアップロードを受け付け，`mnist.py` の `inferFromImage` を呼び出して，実行結果をJSONで返す。
+
+localhostで実行する場合は，`requirements.txt`に書かれているライブラリをインストールした後，`web.py` を実行すればよい（下記）。`http://localhost:5000/` でアクセスできるサーバが起動する。
+
+```bash
+$ pip install -r requirements.txt  # 依存ライブラリをインストール
+$ python3 web.py                   # サーバを起動
+```
+
 
 ### drawingboard.js による手書きUI
 
@@ -105,12 +115,6 @@ drawingboard.js で描いた画像は [data URI](https://ja.wikipedia.org/wiki/D
 
 上記のファイルを置いておけば，Heroku が勝手に必要なライブラリをインストールしてWebサーバ ([Gunicorn](http://gunicorn.org)) を起動してサービスを開始する。
 
-デプロイの前に手元でテスト実行する場合は，下記を実行すればよい。`http://127.0.0.1:5000/` でアクセスできるサーバが起動する。
-
-```bash
-$ pip install -r requirements.txt  # 依存ライブラリをインストール
-$ python3 web.py                   # サーバを起動
-```
 
 ## 使用ライブラリ
 
